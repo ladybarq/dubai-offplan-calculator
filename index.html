@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dubai Off-Plan Calculator</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f5f3;
+      color: #202b2b;
+      margin: 0;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 30px auto;
+      background: white;
+      padding: 28px;
+      border-radius: 18px;
+    }
+
+    h1 { color: #176b63; }
+
+    label {
+      display: block;
+      margin-top: 22px;
+      font-weight: bold;
+    }
+
+    select, input[type="range"] {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    select {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: white;
+    }
+
+    .result {
+      background: #edf6f3;
+      padding: 18px;
+      margin-top: 24px;
+      border-radius: 12px;
+    }
+
+    .number {
+      font-size: 25px;
+      font-weight: bold;
+      color: #176b63;
+    }
+
+    .note {
+      color: #66716e;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <h1>Off-Plan Investment Calculator</h1>
+    <p>Explore your potential Dubai property investment.</p>
+
+    <label for="price">Property price</label>
+    <select id="price">
+      <option value="1000000">AED 1,000,000</option>
+      <option value="1500000">AED 1,500,000</option>
+      <option value="2000000" selected>AED 2,000,000</option>
+      <option value="3000000">AED 3,000,000</option>
+      <option value="5000000">AED 5,000,000</option>
+    </select>
+
+    <label>
+      Down payment: <span id="downLabel">20%</span>
+    </label>
+    <input id="down" type="range"
+           min="5" max="80" step="5" value="20">
+
+    <label>
+      Expected annual growth:
+      <span id="growthLabel">5%</span>
+    </label>
+    <input id="growth" type="range"
+           min="-10" max="20" step="0.5" value="5">
+
+    <label>
+      Investment period:
+      <span id="yearsLabel">5 years</span>
+    </label>
+    <input id="years" type="range"
+           min="1" max="15" step="1" value="5">
+
+    <section class="result">
+      <p>Estimated property value at exit</p>
+      <div class="number" id="futureValue">AED 0</div>
+
+      <p>Initial down payment</p>
+      <div class="number" id="initialPayment">AED 0</div>
+
+      <p>Estimated price appreciation</p>
+      <div class="number" id="profit">AED 0</div>
+
+      <p>Price appreciation vs. property price</p>
+      <div class="number" id="roi">0%</div>
+    </section>
+
+    <p class="note">
+      Educational estimate only. This version excludes transaction
+      fees, installment timing, outstanding payments, rent, and
+      financing. Price appreciation is not guaranteed.
+    </p>
+  </main>
+
+  <script>
+    const price = document.getElementById("price");
+    const down = document.getElementById("down");
+    const growth = document.getElementById("growth");
+    const years = document.getElementById("years");
+
+    function money(amount) {
+      return new Intl.NumberFormat("en-AE", {
+        style: "currency",
+        currency: "AED",
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function calculate() {
+      const propertyPrice = Number(price.value);
+      const downPercent = Number(down.value);
+      const growthRate = Number(growth.value) / 100;
+      const period = Number(years.value);
+
+      const initial = propertyPrice * downPercent / 100;
+
+      const future =
+        propertyPrice * Math.pow(1 + growthRate, period);
+
+      const appreciation = future - propertyPrice;
+      const roi = appreciation / propertyPrice * 100;
+
+      document.getElementById("downLabel").textContent =
+        downPercent + "%";
+
+      document.getElementById("growthLabel").textContent =
+        (growthRate * 100) + "%";
+
+      document.getElementById("yearsLabel").textContent =
+        period + (period === 1 ? " year" : " years");
+
+      document.getElementById("futureValue").textContent =
+        money(future);
+
+      document.getElementById("initialPayment").textContent =
+        money(initial);
+
+      document.getElementById("profit").textContent =
+        money(appreciation);
+
+      document.getElementById("roi").textContent =
+        roi.toFixed(1) + "%";
+    }
+
+    price.addEventListener("change", calculate);
+    down.addEventListener("input", calculate);
+    growth.addEventListener("input", calculate);
+    years.addEventListener("input", calculate);
+
+    calculate();
+  </script>
+</body>
+</html>
